@@ -99,9 +99,16 @@ public with sharing class SOQL {
      * @return A map of Task Ids to Task records.
      * Update the corresponding test class and testGetTasksDueNextWeek method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+    public static Map<Id, Task> getTasksDueNextWeek() {
+        Date today = Date.today();
+        Date dueDay = today.addDays(7);
+        Map<Id, Task> tasksById = new Map<Id, Task>([
+            SELECT Id, ActivityDate, Subject
+            FROM Task
+            WHERE ActivityDate > :today AND ActivityDate <= :dueDay
+        ]);
+        return tasksById;
+    }
 
     /**
      * Question 7
@@ -110,9 +117,15 @@ public with sharing class SOQL {
      * @return A list of Contact records.
      * Update the corresponding test class and testGetContactsByEmailDomain method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}
+    public static List<Contact> getContactsByEmailDomain(String emailDomain) {
+        String likeDomain = '%@' + emailDomain;
+        List<Contact> contacts = [
+            SELECT Id, Name, Email
+            FROM Contact
+            WHERE Email LIKE :likeDomain
+        ];
+        return contacts;
+    }
 
     /**
      * Question 8
@@ -122,7 +135,13 @@ public with sharing class SOQL {
      * @return A list of Opportunity records.
      */
     public static List<Opportunity> getOpportunitiesByNameKeyword(String keyword) {
-        return null; // Replace null with the variable you used to store the result
+        String likeKeyword = '%' + keyword + '%';
+        List<Opportunity> opps = [
+            SELECT Id, Name
+            FROM Opportunity
+            WHERE Name LIKE :likeKeyword
+        ];
+        return opps;
     }
 
     /**
@@ -131,7 +150,10 @@ public with sharing class SOQL {
      * @return A list of Case records.
      */
     public static List<Case> getFilterCaseOrigins() {
-        return null; // Replace null with the variable you used to store the result
+        return [SELECT Id, Origin
+                FROM Case
+                WHERE Origin NOT IN ('Web', 'Email', Null)];
+                // WHERE Origin = 'Phone'];
     }
 
     /**
@@ -144,9 +166,15 @@ public with sharing class SOQL {
      * @return A list of Lead records.
      * Update the corresponding test class and testGetLeadsBySourceOrTitle method to cover this method
      */
-    //[public | private ] [static] data_type method_name (input parameters) {
-    //  The body of the method
-    //}    
+    public static List<Lead> getLeadsBySourceOrTitle(String leadSource, String keyword) {
+        String likeKeyword = '%' + keyword + '%';
+        List<Lead> leads = [
+            SELECT Id, LastName, Company, Phone, Email
+            FROM Lead
+            WHERE LeadSource = :leadSource OR Title LIKE :likeKeyword
+        ];
+        return leads;
+    }
 
     /**
      * Question 11
