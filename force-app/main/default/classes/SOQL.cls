@@ -100,12 +100,10 @@ public with sharing class SOQL {
      * Update the corresponding test class and testGetTasksDueNextWeek method to cover this method
      */
     public static Map<Id, Task> getTasksDueNextWeek() {
-        Date today = Date.today();
-        Date dueDay = today.addDays(7);
         Map<Id, Task> tasksById = new Map<Id, Task>([
             SELECT Id, ActivityDate, Subject
             FROM Task
-            WHERE ActivityDate > :today AND ActivityDate <= :dueDay
+            WHERE ActivityDate > TODAY AND ActivityDate <= NEXT_N_DAYS:7
         ]);
         return tasksById;
     }
@@ -150,10 +148,13 @@ public with sharing class SOQL {
      * @return A list of Case records.
      */
     public static List<Case> getFilterCaseOrigins() {
-        return [SELECT Id, Origin
-                FROM Case
-                WHERE Origin NOT IN ('Web', 'Email', Null)];
-                // WHERE Origin = 'Phone'];
+        List<Case> cases = [
+            SELECT Id, Origin
+            FROM Case
+            WHERE Origin NOT IN ('Web', 'Email', Null)
+            // WHERE Origin = 'Phone'
+        ];
+        return cases;
     }
 
     /**
@@ -185,15 +186,20 @@ public with sharing class SOQL {
      */
     public static List<String> getContactNamesByAccount(Id accountId) {
         // Create a list to hold the Contact LastNames
-
+        List<String> contactNames = new List<String>();
         // Query the Contacts
+        List<Contact> contacts = [
+            SELECT Id, LastName
+            FROM Contact
+            WHERE AccountId = :accountId
+        ];
         // Loop through each Contact and add the LastName to the list
-        //for () {
-        //    
-        //}
+        for (Contact cont : contacts) {
+            contactNames.add(cont.LastName);
+        }
 
         // Return the list of Contact LastNames
-        return null; // Replace null with the variable you used to store the result
+        return contactNames;
     }
 
     /**
@@ -205,9 +211,17 @@ public with sharing class SOQL {
      */
     public static Decimal getTotalRevenueByStage(String stage) {
         // Use AggregateQuery to get the total revenue
-
+        List<AggregateResult> aggrResult = [
+            SELECT SUM(Amount) 
+            FROM Opportunity 
+            WHERE StageName = 'Closed Won' OR Amount > 10000
+        ];
+        Decimal totalRevenue = 0;
+        if (aggrResult.size() > 0) {
+            totalRevenue = (Decimal) aggrResult.get(0).get('expr0');
+        }
         // Return the total revenue
-        return null; // Replace null with the variable you used to store the result
+        return totalRevenue;
     }
 
     /**
@@ -216,7 +230,13 @@ public with sharing class SOQL {
      * @return A list of the first 10 Accounts ordered by Name.
      */
     public static List<Account> getFirstTenAccounts() {
-        return null; // Replace null with the variable you used to store the result
+        List<Account> accounts = [
+            SELECT Id, Name 
+            FROM Account 
+            ORDER BY Name ASC 
+            LIMIT 10
+        ];
+        return accounts;
     }
     
     /**
@@ -225,7 +245,14 @@ public with sharing class SOQL {
      * @return A list of Opportunities with an Amount greater than 100,000, ordered by CloseDate, and limited to 5 records.
      */
     public static List<Opportunity> getHighValueOpportunities() {
-        return null; // Replace null with the variable you used to store the result
+        List<Opportunity> oppty = [
+            SELECT Id, Amount, CloseDate
+            FROM Opportunity 
+            WHERE Amount > 100000
+            ORDER BY CloseDate ASC
+            Limit 5
+        ];
+        return oppty;
     }
     
     /**
@@ -234,7 +261,13 @@ public with sharing class SOQL {
      * @return A list of Contacts
      */
     public static List<Contact> getBirthdateContacts() {
-        return null; // Replace null with the variable you used to store the result
+        List<Contact> contacts = [
+            SELECT Id, Name, Birthdate
+            FROM Contact
+            ORDER BY Birthdate DESC
+            LIMIT 3
+        ];
+        return contacts;
     }
     
     /**
