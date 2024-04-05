@@ -276,7 +276,15 @@ public with sharing class SOQL {
      * @return A list of Cases
      */
     public static List<Case> getCasesWithStatus() {
-        return null; // Replace null with the variable you used to store the result
+        List<Case> cases = [
+            SELECT Id, Status, CreatedDate
+            FROM Case
+            WHERE Status != 'Closed'
+            ORDER BY CreatedDate ASC
+            LIMIT 10
+            OFFSET 5
+        ];
+        return cases;
     }
 
     /**
@@ -287,15 +295,11 @@ public with sharing class SOQL {
      * @return A set of Case Ids.
      */
     public static Set<Id> getCaseIdsByAccount(Id accountId) {
-        // Create a set to hold the Case Ids
-
-        // Query the Cases
-        // Loop through each Case and add the Id to the set
-        //for () {
-        //    
-        //}
-
-        return null; // Replace null with the variable you used to store the result
+        // Query the Cases and store to the Map
+        Map<Id, Case> casesById = new Map<Id, Case>([
+            SELECT Id FROM Case WHERE AccountId = :accountId
+        ]);
+        return casesById.keySet();
     }
 
     /**
@@ -308,11 +312,17 @@ public with sharing class SOQL {
     public static Map<Id, String> getAccountIdsToNamesNotInCountry(String country) {
         // Create a map to hold the Account Ids to Account Names
         Map<Id, String> accountIdsToNames = new Map<Id, String>();
-
         // Query the Accounts
+        List<Account> accounts = [
+            SELECT Id, Name
+            FROM Account
+            WHERE BillingCountry != :country
+        ];
         // Loop through each Account and add the Id and Name to the map
-
-        return null; // Replace null with the variable you used to store the result
+        for (Account acc : accounts) {
+            accountIdsToNames.put(acc.Id, acc.Name);
+        }
+        return accountIdsToNames;
     }
 
     /**
@@ -323,7 +333,13 @@ public with sharing class SOQL {
      * @return The Account Name of the Contact.
      */
     public static String getAccountNameForContact(String contactId) {
-        return null; // Replace null with the variable you used to store the result
+        Contact contact = [
+            SELECT Id, Account.Name
+            FROM Contact
+            WHERE Id = :contactId
+            LIMIT 1
+        ];
+        return contact.Account.Name;
     }    
 
     /**
@@ -334,7 +350,13 @@ public with sharing class SOQL {
      * @return An Account record with related Opportunities.
      */
     public static Account getOpportunityAndAccountNamesForLineItem(Id accountId) {
-        return null; // Replace null with the variable you used to store the result
+        Account account = [
+            SELECT Id, Name, (SELECT Id, Name FROM Opportunities)
+            FROM Account
+            WHERE id = :accountId
+            LIMIT 1
+        ];
+        return account;
     }
 
     /**
