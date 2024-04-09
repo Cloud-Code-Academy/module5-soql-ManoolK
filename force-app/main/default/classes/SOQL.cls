@@ -214,7 +214,7 @@ public with sharing class SOQL {
         List<AggregateResult> aggrResult = [
             SELECT SUM(Amount) 
             FROM Opportunity 
-            WHERE StageName = 'Closed Won' OR Amount > 10000
+            WHERE StageName = :stage OR Amount > 10000
         ];
         Decimal totalRevenue = 0;
         if (aggrResult.size() > 0) {
