@@ -230,13 +230,12 @@ public with sharing class SOQL {
      * @return A list of the first 10 Accounts ordered by Name.
      */
     public static List<Account> getFirstTenAccounts() {
-        List<Account> accounts = [
+        return [
             SELECT Id, Name 
             FROM Account 
             ORDER BY Name ASC 
             LIMIT 10
         ];
-        return accounts;
     }
     
     /**
@@ -245,14 +244,13 @@ public with sharing class SOQL {
      * @return A list of Opportunities with an Amount greater than 100,000, ordered by CloseDate, and limited to 5 records.
      */
     public static List<Opportunity> getHighValueOpportunities() {
-        List<Opportunity> oppty = [
+        return [
             SELECT Id, Amount, CloseDate
             FROM Opportunity 
             WHERE Amount > 100000
             ORDER BY CloseDate ASC
             Limit 5
         ];
-        return oppty;
     }
     
     /**
@@ -261,13 +259,12 @@ public with sharing class SOQL {
      * @return A list of Contacts
      */
     public static List<Contact> getBirthdateContacts() {
-        List<Contact> contacts = [
+        return [
             SELECT Id, Name, Birthdate
             FROM Contact
             ORDER BY Birthdate DESC
             LIMIT 3
         ];
-        return contacts;
     }
     
     /**
@@ -276,7 +273,7 @@ public with sharing class SOQL {
      * @return A list of Cases
      */
     public static List<Case> getCasesWithStatus() {
-        List<Case> cases = [
+        return [
             SELECT Id, Status, CreatedDate
             FROM Case
             WHERE Status != 'Closed'
@@ -284,7 +281,6 @@ public with sharing class SOQL {
             LIMIT 10
             OFFSET 5
         ];
-        return cases;
     }
 
     /**
@@ -350,13 +346,12 @@ public with sharing class SOQL {
      * @return An Account record with related Opportunities.
      */
     public static Account getOpportunityAndAccountNamesForLineItem(Id accountId) {
-        Account account = [
+        return [
             SELECT Id, Name, (SELECT Id, Name FROM Opportunities)
             FROM Account
             WHERE id = :accountId
             LIMIT 1
         ];
-        return account;
     }
 
     /**
@@ -398,12 +393,11 @@ public with sharing class SOQL {
             domains.add('www.' + lead.Email.split('@')[1]);
         }
         // Query the Accounts
-        List<Account> accounts = [
+        return [
             SELECT Id, Website
             FROM Account
             WHERE Website IN :domains
         ];
-        return accounts;
     }
 
     /**
@@ -447,12 +441,11 @@ public with sharing class SOQL {
      * @return A list of filtered Opportunity
      */
     public static List<Opportunity> getOpportunityDetailsForClosedWon() {    
-        List<Opportunity> opps = [
+        return [
             SELECT Id, Name, Account.Name, Owner.Name
             FROM Opportunity
             WHERE StageName = 'Closed Won'
-        ];    
-        return opps;
+        ];
     }
 
     /**
